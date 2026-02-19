@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rico Express | Mensajería Valle de Aburrá</title>
+    <style>
+        :root {
+            --verde-marca: #27ae60;
+            --dorado-marca: #d4af37;
+            --negro-profundo: #1a1a1a;
+            --blanco-puro: #ffffff;
+            --gris-claro: #f4f4f4;
+        }
+        
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: var(--gris-claro); color: var(--negro-profundo); scroll-behavior: smooth; }
+        
+        /* Navegación */
+        header { background-color: var(--negro-profundo); color: var(--blanco-puro); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dorado-marca); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.6rem; font-weight: bold; color: var(--blanco-puro); letter-spacing: 1px; }
+        .logo span { color: var(--verde-marca); }
+
+        /* Hero */
+        .hero { background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; color: var(--blanco-puro); text-align: center; padding: 5rem 1rem; }
+        .hero h1 { font-size: 2.5rem; color: var(--dorado-marca); text-transform: uppercase; margin-bottom: 10px; }
+
+        .btn { background-color: var(--dorado-marca); color: var(--negro-profundo); padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; display: inline-block; }
+        .btn:hover { background-color: var(--verde-marca); color: var(--blanco-puro); }
+
+        /* Contenedores */
+        .seccion { padding: 4rem 10%; }
+        .titulo-seccion { text-align: center; margin-bottom: 2rem; }
+        .titulo-seccion h2 { color: var(--negro-profundo); font-size: 2rem; position: relative; display: inline-block; }
+        .titulo-seccion h2::after { content: ''; width: 60px; height: 3px; background: var(--dorado-marca); position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); }
+
+        /* Reseñas */
+        .grid-resenas { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .tarjeta-resena { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 4px solid var(--verde-marca); }
+        .estrellas { color: var(--dorado-marca); margin-bottom: 10px; }
+
+        /* Formulario */
+        .contenedor-formulario { max-width: 500px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--verde-marca); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 6px; box-sizing: border-box; }
+
+        /* FAQ */
+        .faq { max-width: 700px; margin: 0 auto; }
+        .faq-item { background: white; margin-bottom: 10px; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 4px solid var(--dorado-marca); }
+        .faq-item h4 { margin: 0; color: var(--negro-profundo); }
+        .faq-item p { margin: 10px 0 0 0; color: #555; font-size: 0.95rem; line-height: 1.4; }
+
+        footer { background-color: var(--negro-profundo); color: var(--blanco-puro); text-align: center; padding: 3rem; margin-top: 4rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">RICO <span>EXPRESS</span></div>
+        <a href="#solicitar" class="btn">SOLICITAR</a>
+    </header>
+
+    <section class="hero">
+        <h1>Mensajería en el Valle de Aburrá</h1>
+        <p>Tu paquete en las mejores manos, rápido y seguro.</p>
+        <a href="#opinion" class="btn" style="background-color: transparent; border: 2px solid var(--dorado-marca); color: white; margin-top: 10px;">DÉJANOS TU OPINIÓN</a>
+    </section>
+
+    <section id="solicitar" class="seccion">
+        <div class="contenedor-formulario">
+            <h2 style="text-align: center;">📦 Solicitar Servicio</h2>
+            <form onsubmit="enviarWhatsApp(event)">
+                <div class="form-group"><label>Nombre:</label><input type="text" id="nombre" required></div>
+                <div class="form-group"><label>Recogida:</label><input type="text" id="recogida" required placeholder="Barrio y Municipio"></div>
+                <div class="form-group"><label>Entrega:</label><input type="text" id="entrega" required placeholder="Barrio y Municipio"></div>
+                <div class="form-group"><label>¿Qué enviamos?</label><textarea id="detalles" rows="2" required></textarea></div>
+                <button type="submit" class="btn" style="width: 100%;">PEDIR MENSAJERO</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="seccion" style="background-color: #eee;">
+        <div class="titulo-seccion"><h2>Lo que dicen nuestros clientes</h2></div>
+        <div class="grid-resenas">
+            <div class="tarjeta-resena">
+                <div class="estrellas">★★★★★</div>
+                <p>"Excelente servicio, muy puntuales para recoger un paquete en Envigado y llevarlo a Bello."</p>
+                <strong>- Carlos Restrepo</strong>
+            </div>
+            <div class="tarjeta-resena">
+                <div class="estrellas">★★★★★</div>
+                <p>"Muy confiable. Rico Express me ayudó con unas vueltas bancarias y todo salió perfecto."</p>
+                <strong>- Elena Gómez</strong>
+            </div>
+            <div class="tarjeta-resena">
+                <div class="estrellas">★★★★★</div>
+                <p>"El mensajero muy amable y honesto. Los recomiendo 100% para entregas rápidas."</p>
+                <strong>- Juan Pablo D.</strong>
+            </div>
+        </div>
+        <div id="opinion" style="text-align: center; margin-top: 30px;">
+            <p>¿Ya usaste nuestro servicio?</p>
+            <button onclick="enviarOpinion()" class="btn" style="background-color: var(--verde-marca); color: white;">DÉJANOS TU OPINIÓN AQUÍ</button>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <div class="titulo-seccion"><h2>Preguntas Frecuentes</h2></div>
+        <div class="faq">
+            <div class="faq-item">
+                <h4>¿Cuál es el horario de atención?</h4>
+                <p>Nuestro horario de servicio es de <strong>9:00 AM a 5:00 PM</strong> los días <strong>Lunes, Miércoles, Jueves, Viernes y Sábado</strong>. (Martes y Domingos no hay servicio).</p>
+            </div>
+            <div class="faq-item">
+                <h4>¿A qué municipios llegan?</h4>
+                <p>Cubrimos todo el Valle de Aburrá: Medellín, Envigado, Itagüí, Sabaneta, Bello, La Estrella, Caldas, Copacabana, Girardota y Barbosa.</p>
+            </div>
+            <div class="faq-item">
+                <h4>¿Cómo se calcula el precio?</h4>
+                <p>El valor se basa en la distancia recorrida y la urgencia del servicio. ¡Consúltanos por WhatsApp para una cotización inmediata!</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>RICO EXPRESS 🛵</strong></p>
+        <p>Servicio Independiente de Mensajería</p>
+        <p>Valle de Aburrá, Antioquia</p>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">© 2026 Rico Express</p>
+    </footer>
+
+    <script>
+        const telefono = "573134646181";
+
+        function enviarWhatsApp(event) {
+            event.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const recogida = document.getElementById('recogida').value;
+            const entrega = document.getElementById('entrega').value;
+            const detalles = document.getElementById('detalles').value;
+            
+            const mensaje = `*Rico Express 🛵*%0A*Nueva Solicitud*%0A%0A*Cliente:* ${nombre}%0A*Origen:* ${recogida}%0A*Destino:* ${entrega}%0A*Detalles:* ${detalles}`;
+            window.open(`https://wa.me/${telefono}?text=${mensaje}`, '_blank');
+        }
+
+        function enviarOpinion() {
+            const mensajeOpinion = `Hola Rico Express 🛵, quiero dejar mi opinión sobre el servicio:`;
+            window.open(`https://wa.me/${telefono}?text=${mensajeOpinion}`, '_blank');
+        }
+    </script>
+</body>
+</html>
