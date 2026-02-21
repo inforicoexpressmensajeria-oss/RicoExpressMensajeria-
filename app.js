@@ -17,11 +17,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 4. Tarifas de Rico Express
-const tarifas = {
+// 4. const tarifas = {
     "Medellín": 12000, "Bello": 17000, "Itagüí": 17000, "Envigado": 17000,
     "Sabaneta": 17000, "La Estrella": 18000, "San Antonio de Prado": 20000,
     "Caldas": 25000, "Copacabana": 23000, "Girardota": 33000, "Barbosa": 43000
+};
+
+// Función para cambiar de pantalla
+window.mostrarSeccion = (id) => {
+    document.querySelectorAll('.seccion-app').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+};
+
+// Función para actualizar el precio
+const selectorMunicipio = document.getElementById('municipio');
+const displayValor = document.getElementById('display-valor');
+
+if (selectorMunicipio) {
+    selectorMunicipio.addEventListener('change', () => {
+        const seleccion = selectorMunicipio.value;
+        const precio = tarifas[seleccion] || 0;
+        // Formatea el precio con puntos de miles
+        displayValor.innerText = `$${precio.toLocaleString('es-CO')}`;
+    });
+}
+
 };
 
 // 5. Lógica para guardar el servicio y enviar WhatsApp
