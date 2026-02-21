@@ -9,28 +9,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
+
     <header>
         <div class="logo">RICO <span>EXPRESS</span></div>
-        <nav>
-            <button onclick="showSection('nuevo-servicio')">Nuevo Servicio</button>
-            <button onclick="showSection('rastreo')">Rastrear Guía</button>
-            <button onclick="showSection('admin')" class="btn-admin">Admin</button>
-        </nav>
+        <div class="status-online">● Sistema Activo</div>
     </header>
 
-    <main id="content">
-        <section id="nuevo-servicio" class="active">
-            <h2>Solicitar Mensajería</h2>
+    <nav class="tabs-menu">
+        <button class="tab-btn active" onclick="mostrarSeccion('registro')">SERVICIO</button>
+        <button class="tab-btn" onclick="mostrarSeccion('rastreo')">RASTREO</button>
+        <button class="tab-btn" onclick="mostrarSeccion('login-admin')">ADMIN</button>
+    </nav>
+
+    <main class="container">
+        
+        <section id="registro" class="seccion-app active">
             <form id="form-servicio">
-                <input type="text" id="nombre" placeholder="Nombre Cliente" required>
-                <input type="tel" id="telefono" placeholder="WhatsApp (Ej: 310...)" required>
+                <h2>Solicitar Mensajero</h2>
+                <input type="text" id="nombre" placeholder="Nombre del Cliente" required>
+                <input type="tel" id="telefono" placeholder="WhatsApp (Ej: 313...)" required>
                 <input type="text" id="origen" placeholder="Dirección de Recogida" required>
                 <input type="text" id="destino" placeholder="Dirección de Entrega" required>
-                <select id="municipio" onchange="actualizarPrecio()">
+                
+                <label for="municipio">Municipio de Destino:</label>
+                <select id="municipio">
                     <option value="Medellín">Medellín ($12.000)</option>
                     <option value="Bello">Bello ($17.000)</option>
-                    <option value="Envigado">Envigado ($17.000)</option>
                     <option value="Itagüí">Itagüí ($17.000)</option>
+                    <option value="Envigado">Envigado ($17.000)</option>
                     <option value="Sabaneta">Sabaneta ($17.000)</option>
                     <option value="La Estrella">La Estrella ($18.000)</option>
                     <option value="San Antonio de Prado">San Antonio de Prado ($20.000)</option>
@@ -38,24 +44,55 @@
                     <option value="Copacabana">Copacabana ($23.000)</option>
                     <option value="Girardota">Girardota ($33.000)</option>
                     <option value="Barbosa">Barbosa ($43.000)</option>
-                    <option value="Otro">Otro (Por KM)</option>
                 </select>
-                <div id="div-km" style="display:none;">
-                    <input type="number" id="km" placeholder="Distancia en KM" oninput="actualizarPrecio()">
+
+                <div class="pago-resumen">
+                    <p>Total a pagar: <strong id="display-valor">$12.000</strong></p>
+                    <small>Nequi: 3003565305</small>
                 </div>
-                <div class="precio-display">Total: <span id="total-servicio">$12.000</span></div>
-                <button type="submit" class="btn-primary">CREAR SERVICIO</button>
+
+                <button type="submit" id="btn-crear">CREAR GUÍA Y PEDIR</button>
             </form>
         </section>
 
-        <section id="rastreo">
-            <h2>Rastreo de Guía</h2>
-            <input type="text" id="input-guia" placeholder="Ej: RX17154321">
-            <button onclick="consultarGuia()" class="btn-primary">Consultar</button>
-            <div id="resultado-rastreo"></div>
+        <section id="rastreo" class="seccion-app">
+            <div class="card">
+                <h2>Rastrear mi Pedido</h2>
+                <p>Ingresa tu número de guía RX para consultar el estado.</p>
+                <input type="text" id="input-guia" placeholder="Ej: RX123456">
+                <button class="btn-negro" onclick="buscarGuia()">CONSULTAR ESTADO</button>
+                <div id="resultado-rastreo" class="resultado"></div>
+            </div>
         </section>
+
+        <section id="login-admin" class="seccion-app">
+            <div class="card login-card">
+                <h2>Acceso Administrativo</h2>
+                <input type="email" id="admin-email" placeholder="Correo de Admin">
+                <input type="password" id="admin-pass" placeholder="Contraseña">
+                <button class="btn-negro" onclick="loginAdmin()">ENTRAR AL PANEL</button>
+            </div>
+        </section>
+
     </main>
 
     <script type="module" src="app.js"></script>
+
+    <script>
+        function mostrarSeccion(idSeccion) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.seccion-app').forEach(section => {
+                section.classList.remove('active');
+            });
+            // Quitar clase active de los botones
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // Mostrar la seleccionada
+            document.getElementById(idSeccion).classList.add('active');
+            // Activar botón correspondiente
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
