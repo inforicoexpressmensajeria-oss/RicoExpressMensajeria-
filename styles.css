@@ -59,7 +59,8 @@ input, select {
     text-align: center;
     margin: 1rem 0;
     color: var(--negro);
-} .seccion-app { display: none; }
+} 
+.seccion-app { display: none; }
 .seccion-app.active { display: block; }
 
 .tabs { display: flex; justify-content: space-around; background: #000; padding: 10px; }
