@@ -3,96 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rico Express | Mensajería Independiente</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Rico Express | Mensajería Valle de Aburrá</title>
+    <style>
+        :root {
+            --verde: #27ae60;
+            --dorado: #d4af37;
+            --negro: #1a1a1a;
+            --blanco: #ffffff;
+            --gris: #f4f4f4;
+        }
+        
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: var(--gris); color: var(--negro); scroll-behavior: smooth; }
+        header { background-color: var(--negro); color: var(--blanco); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dorado); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.6rem; font-weight: bold; letter-spacing: 1px; }
+        .logo span { color: var(--verde); }
+        
+        .hero { background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/135c2640-d17b-4896-b291-90385f31c59b.png'); background-size: cover; background-position: center; color: var(--blanco); text-align: center; padding: 6rem 1rem; }
+        .hero h1 { color: var(--dorado); font-size: 2.5rem; margin-bottom: 10px; text-transform: uppercase; }
+
+        .btn { background-color: var(--dorado); color: var(--negro); padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: 800; border: none; cursor: pointer; transition: 0.3s; display: inline-block; }
+        .btn:hover { background-color: var(--verde); color: var(--blanco); }
+
+        .seccion { padding: 4rem 8%; }
+        .titulo-seccion { text-align: center; margin-bottom: 2rem; }
+        .titulo-seccion h2 { font-size: 2rem; border-bottom: 3px solid var(--dorado); display: inline-block; padding-bottom: 10px; }
+
+        /* Estilos de Tabla de Precios */
+        .tabla-precios { width: 100%; max-width: 800px; margin: 0 auto; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .tabla-precios th { background: var(--negro); color: var(--dorado); padding: 15px; text-align: left; }
+        .tabla-precios td { padding: 12px 15px; border-bottom: 1px solid #eee; }
+        .tabla-precios tr:hover { background-color: #f9f9f9; }
+
+        /* Galería */
+        .grid-fotos { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .grid-fotos img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 2px solid var(--dorado); }
+
+        .contenedor-formulario { max-width: 500px; margin: 0 auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid var(--verde); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+
+        footer { background-color: var(--negro); color: var(--blanco); text-align: center; padding: 2rem; }
+    </style>
 </head>
 <body>
 
     <header>
         <div class="logo">RICO <span>EXPRESS</span></div>
-        <div class="status-online">● Sistema Activo</div>
+        <a href="tel:+573134646181" class="btn" style="padding: 8px 15px;">LLAMAR</a>
     </header>
 
-    <nav class="tabs-menu">
-        <button class="tab-btn active" onclick="mostrarSeccion('registro')">SERVICIO</button>
-        <button class="tab-btn" onclick="mostrarSeccion('rastreo')">RASTREO</button>
-        <button class="tab-btn" onclick="mostrarSeccion('login-admin')">ADMIN</button>
-    </nav>
+    <section class="hero">
+        <h1>Mensajería Independiente</h1>
+        <p>Servicio rápido y confiable en todo el Valle de Aburrá</p>
+        <div id="status" style="margin-top: 20px; font-weight: bold;"></div>
+    </section>
 
-    <main class="container">
-        
-        <section id="registro" class="seccion-app active">
-            <form id="form-servicio">
-                <h2>Solicitar Mensajero</h2>
-                <input type="text" id="nombre" placeholder="Nombre del Cliente" required>
-                <input type="tel" id="telefono" placeholder="WhatsApp (Ej: 313...)" required>
-                <input type="text" id="origen" placeholder="Dirección de Recogida" required>
-                <input type="text" id="destino" placeholder="Dirección de Entrega" required>
-                
-                <label for="municipio">Municipio de Destino:</label>
-                <select id="municipio">
-                    <option value="Medellín">Medellín ($12.000)</option>
-                    <option value="Bello">Bello ($17.000)</option>
-                    <option value="Itagüí">Itagüí ($17.000)</option>
-                    <option value="Envigado">Envigado ($17.000)</option>
-                    <option value="Sabaneta">Sabaneta ($17.000)</option>
-                    <option value="La Estrella">La Estrella ($18.000)</option>
-                    <option value="San Antonio de Prado">San Antonio de Prado ($20.000)</option>
-                    <option value="Caldas">Caldas ($25.000)</option>
-                    <option value="Copacabana">Copacabana ($23.000)</option>
-                    <option value="Girardota">Girardota ($33.000)</option>
-                    <option value="Barbosa">Barbosa ($43.000)</option>
-                </select>
+    <section class="seccion">
+        <div class="titulo-seccion"><h2>Nuestro Equipo</h2></div>
+        <div class="grid-fotos">
+            <img src="https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/135c2640-d17b-4896-b291-90385f31c59b.png" alt="Rico Express">
+            <img src="https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/bf97ffcb-6985-4734-b319-7dd7104e0642.png" alt="Mensajería Medellín">
+            <img src="https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/b8790461-b570-404f-9751-520cf3046d04.png" alt="Servicio Seguro">
+        </div>
+    </section>
 
-                <div class="pago-resumen">
-                    <p>Total a pagar: <strong id="display-valor">$12.000</strong></p>
-                    <small>Nequi: 3003565305</small>
-                </div>
+    <section class="seccion" style="background-color: #fff;">
+        <div class="titulo-seccion"><h2>Tarifas por Municipio</h2></div>
+        <table class="tabla-precios">
+            <thead>
+                <tr><th>Municipio</th><th>Precio Desde</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Medellín</td><td>$12.000</td></tr>
+                <tr><td>Itagüí / Envigado / Sabaneta / Bello</td><td>$17.000</td></tr>
+                <tr><td>La Estrella</td><td>$18.000</td></tr>
+                <tr><td>San Antonio de Prado</td><td>$20.000</td></tr>
+                <tr><td>Caldas / Copacabana</td><td>$25.000</td></tr>
+                <tr><td>Girardota</td><td>$33.000</td></tr>
+                <tr><td>Barbosa</td><td>$41.000</td></tr>
+            </tbody>
+        </table>
+        <p style="text-align: center; margin-top: 20px; font-size: 0.9rem;">
+            <strong>Fuera del Área Metropolitana:</strong> Cobro por kilometraje ($2.000 por Km).
+        </p>
+    </section>
 
-                <button type="submit" id="btn-crear">CREAR GUÍA Y PEDIR</button>
+    <section id="solicitar" class="seccion" style="background-color: var(--gris);">
+        <div class="contenedor-formulario">
+            <h2 style="text-align: center; margin-top:0;">📦 Pedir Mensajero</h2>
+            <form onsubmit="enviarWhatsApp(event)">
+                <div class="form-group"><label>Tu Nombre:</label><input type="text" id="nombre" required></div>
+                <div class="form-group"><label>Punto A (Recogida):</label><input type="text" id="recogida" required></div>
+                <div class="form-group"><label>Punto B (Entrega):</label><input type="text" id="entrega" required></div>
+                <div class="form-group"><label>¿Qué llevamos?</label><textarea id="detalles" rows="2" required></textarea></div>
+                <button type="submit" class="btn" style="width: 100%;">ENVIAR SOLICITUD</button>
             </form>
-        </section>
+        </div>
+    </section>
 
-        <section id="rastreo" class="seccion-app">
-            <div class="card">
-                <h2>Rastrear mi Pedido</h2>
-                <p>Ingresa tu número de guía RX para consultar el estado.</p>
-                <input type="text" id="input-guia" placeholder="Ej: RX123456">
-                <button class="btn-negro" onclick="buscarGuia()">CONSULTAR ESTADO</button>
-                <div id="resultado-rastreo" class="resultado"></div>
-            </div>
-        </section>
-
-        <section id="login-admin" class="seccion-app">
-            <div class="card login-card">
-                <h2>Acceso Administrativo</h2>
-                <input type="email" id="admin-email" placeholder="Correo de Admin">
-                <input type="password" id="admin-pass" placeholder="Contraseña">
-                <button class="btn-negro" onclick="loginAdmin()">ENTRAR AL PANEL</button>
-            </div>
-        </section>
-
-    </main>
-
-    <script type="module" src="app.js"></script>
+    <footer>
+        <p><strong>RICO EXPRESS 🛵</strong></p>
+        <p>Lunes, Miércoles a Sábado: 9AM - 5PM</p>
+        <p>WhatsApp: 313 464 6181</p>
+    </footer>
 
     <script>
-        function mostrarSeccion(idSeccion) {
-            // Ocultar todas las secciones
-            document.querySelectorAll('.seccion-app').forEach(section => {
-                section.classList.remove('active');
-            });
-            // Quitar clase active de los botones
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            // Mostrar la seleccionada
-            document.getElementById(idSeccion).classList.add('active');
-            // Activar botón correspondiente
-            event.currentTarget.classList.add('active');
+        function enviarWhatsApp(event) {
+            event.preventDefault();
+            const tel = "573134646181";
+            const msg = `*Rico Express 🛵*%0A*Nueva Solicitud*%0A%0A*Cliente:* ${document.getElementById('nombre').value}%0A*Origen:* ${document.getElementById('recogida').value}%0A*Destino:* ${document.getElementById('entrega').value}%0A*Detalles:* ${document.getElementById('detalles').value}`;
+            window.open(`https://wa.me/${tel}?text=${msg}`, '_blank');
         }
+
+        function ver horario() {
+            const h = new Date().getHours();
+            const d = new Date().getDay();
+            const abierto = [1,3,4,5,6].includes(d) && (h >= 9 && h < 17);
+            const status = document.getElementById('status');
+            status.innerHTML = abierto ? "🟢 ABIERTO AHORA" : "🔴 CERRADO (9AM - 5PM)";
+            status.style.color = abierto ? "#27ae60" : "#e74c3c";
+        }
+        horario();
     </script>
 </body>
 </html>
