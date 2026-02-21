@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rico Express | Mensajería Rápida Medellín</title>
+    <title>Rico Express | Mensajería Medellín</title>
     <style>
         :root {
             --verde: #27ae60;
@@ -16,180 +16,160 @@
         
         body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: var(--gris); color: var(--negro); line-height: 1.6; }
         
-        /* Encabezado */
-        header { background-color: var(--negro); color: var(--blanco); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dorado); position: sticky; top: 0; z-index: 1000; }
-        .logo { font-size: 1.5rem; font-weight: bold; }
-        .logo span { color: var(--verde); }
+        /* Navegación con Logo */
+        header { background-color: var(--negro); color: var(--blanco); padding: 0.8rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--dorado); position: sticky; top: 0; z-index: 1000; }
+        .logo-img { height: 50px; vertical-align: middle; }
 
-        /* Hero Principal */
-        .hero { background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/135c2640-d17b-4896-b291-90385f31c59b.png'); background-size: cover; background-position: center; color: var(--blanco); text-align: center; padding: 5rem 1rem; }
-        .hero h1 { color: var(--dorado); font-size: 2.2rem; text-transform: uppercase; margin-bottom: 1rem; }
-        .hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto; }
-        .badge-hero { display: inline-block; background: var(--verde); color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-top: 15px; }
+        /* Hero */
+        .hero { background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/135c2640-d17b-4896-b291-90385f31c59b.png'); background-size: cover; background-position: center; color: var(--blanco); text-align: center; padding: 4rem 1rem; }
+        .hero h1 { color: var(--dorado); font-size: 2rem; text-transform: uppercase; margin-bottom: 1rem; }
+        
+        /* Estado del Horario */
+        #status-box { display: inline-block; padding: 8px 20px; border-radius: 50px; font-weight: bold; margin-top: 15px; border: 2px solid; background: rgba(0,0,0,0.3); }
 
-        /* Secciones Generales */
-        .seccion { padding: 4rem 10%; }
+        .seccion { padding: 3rem 10%; }
         .titulo-seccion { text-align: center; margin-bottom: 2rem; }
         .titulo-seccion h2 { color: var(--negro); border-bottom: 3px solid var(--dorado); display: inline-block; padding-bottom: 10px; }
 
-        /* Beneficios y Aliados */
+        /* Tarjetas y Tarifas */
         .grid-beneficios { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .tarjeta-plana { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 3px solid var(--verde); }
-        .tarjeta-plana h3 { color: var(--verde); margin-top: 0; }
-
-        /* Tabla de Tarifas */
-        .tabla-precios { width: 100%; max-width: 700px; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .tabla-precios th { background: var(--negro); color: var(--dorado); padding: 15px; }
+        .tabla-precios { width: 100%; max-width: 600px; margin: 0 auto; border-collapse: collapse; background: white; }
         .tabla-precios td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
 
-        /* Formulario Especializado */
-        .contenedor-formulario { max-width: 600px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--dorado); }
-        .form-group { margin-bottom: 15px; }
+        /* Botón Verde de Solicitud */
+        .btn-solicitar { background-color: var(--verde); color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.2rem; display: inline-block; transition: 0.3s; border: none; cursor: pointer; }
+        .btn-solicitar:hover { background-color: #219150; transform: scale(1.05); }
+
+        /* Formulario */
+        .contenedor-formulario { max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid var(--dorado); }
+        .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
         .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        
-        .evidencia-badge { background: #e8f5e9; color: #2e7d32; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 20px; border: 1px dashed #2e7d32; }
 
-        /* Footer */
-        footer { background-color: var(--negro); color: var(--blanco); text-align: center; padding: 3rem; }
+        footer { background-color: var(--negro); color: var(--blanco); text-align: center; padding: 2rem; margin-top: 3rem; }
         .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background: var(--whatsapp); color: white; padding: 15px 20px; border-radius: 50px; text-decoration: none; font-weight: bold; z-index: 2000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-        @media (max-width: 600px) { .seccion { padding: 2rem 5%; } .hero h1 { font-size: 1.8rem; } }
+        @media (max-width: 600px) { .seccion { padding: 2rem 5%; } }
     </style>
 </head>
 <body>
 
-    <a href="https://wa.me/573134646181" class="whatsapp-float">💬 Solicitar WhatsApp</a>
+    <a href="https://wa.me/573134646181" class="whatsapp-float">💬 WhatsApp</a>
 
     <header>
-        <div class="logo">RICO <span>EXPRESS</span></div>
-        <a href="#solicitar" class="btn" style="padding: 8px 15px;">PEDIR SERVICIO</a>
+        <div class="logo">
+            <img src="https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/6fac06cb-daef-43ea-a826-9063918c317a.png" alt="Rico Express Logo" class="logo-img">
+        </div>
+        <a href="tel:+573134646181" style="color:var(--dorado); text-decoration:none; font-weight:bold;">📞 LLAMAR</a>
     </header>
 
     <section class="hero">
-        <h1>Mensajería rápida y confiable en Medellín y el Área Metropolitana</h1>
-        <p>En Rico Express Mensajería entregamos tus paquetes el mismo día, con responsabilidad, cuidado y cumplimiento.</p>
-        <div class="badge-hero">🚀 Tú vendes, nosotros lo entregamos</div>
+        <img src="https://i.supaimg.com/178d0972-a3a4-44a6-9d24-3ac9b5fc423a/6fac06cb-daef-43ea-a826-9063918c317a.png" style="height: 120px; margin-bottom: 20px;">
+        <h1>Mensajería rápida y confiable en Medellín</h1>
+        <p>Entregamos tus paquetes el mismo día con responsabilidad y cumplimiento.</p>
+        <div id="status-box">Cargando horario...</div>
     </section>
 
     <section class="seccion">
         <div class="titulo-seccion"><h2>¿Por qué elegirnos?</h2></div>
         <div class="grid-beneficios">
             <div class="tarjeta-plana">
-                <h3>⚡ Rapidez</h3>
-                <p>Entregas el mismo día y atención rápida por WhatsApp para tus despachos.</p>
+                <h3>🚀 Mismo Día</h3>
+                <p>Tus pedidos llegan hoy mismo. Ideal para tiendas online y urgencias.</p>
+            </div>
+            <div class="tarjeta-plana">
+                <h3>🛡️ Seguridad</h3>
+                <p>Manejo cuidadoso de mercancía y registro con evidencia digital.</p>
             </div>
             <div class="tarjeta-plana">
                 <h3>📍 Cobertura</h3>
-                <p>Presencia en Medellín y todos los municipios del Valle de Aburrá.</p>
-            </div>
-            <div class="tarjeta-resena" style="grid-column: span 1; background: #fffbe6; padding: 20px; border-radius: 10px;">
-                <p>✅ Manejo cuidadoso de mercancía<br>
-                ✅ Registro con foto, firma y hora<br>
-                ✅ Apoyo a emprendedores</p>
+                <p>Todo el Valle de Aburrá y municipios cercanos por kilometraje.</p>
             </div>
         </div>
-        <p style="text-align: center; margin-top: 30px; font-style: italic;">
-            💚 Somos un emprendimiento local, trabajando con esfuerzo y dedicación. Agradecemos la confianza de cada cliente.
-        </p>
     </section>
 
-    <section class="seccion" style="background-color: var(--negro); color: white;">
-        <div class="titulo-seccion"><h2 style="color: var(--dorado); border-color: var(--dorado);">Ideal para</h2></div>
-        <div class="grid-beneficios" style="text-align: center;">
-            <div>📦 <strong>Tiendas online</strong></div>
-            <div>💼 <strong>Emprendedores</strong></div>
-            <div>🏪 <strong>Negocios locales</strong></div>
-            <div>🏢 <strong>Empresas</strong></div>
+    <section id="solicitar" class="seccion" style="background-color: #f0f0f0; text-align: center;">
+        <div class="contenedor-formulario">
+            <h2 style="margin-top:0;">Solicita tu servicio</h2>
+            <p style="margin-bottom: 20px; font-weight: bold; color: var(--verde);">Entrega certificada con foto y firma digital</p>
+            
+            <form onsubmit="enviarWhatsApp(event)">
+                <div class="form-group"><label>Nombre Remitente:</label><input type="text" id="remitente" required></div>
+                <div class="form-group"><label>Correo Electrónico:</label><input type="email" id="email" placeholder="Para registro de entrega"></div>
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                <div class="form-group"><label>Nombre Destinatario:</label><input type="text" id="destinatario" required></div>
+                <div class="form-group"><label>Cédula Destinatario:</label><input type="text" id="cedula" required></div>
+                <div class="form-group"><label>Dirección de Recogida:</label><input type="text" id="recogida" required></div>
+                <div class="form-group"><label>Dirección de Entrega:</label><input type="text" id="entrega" required></div>
+                <div class="form-group"><label>Datos completos del envío:</label><textarea id="envio" rows="3" required placeholder="Describe qué llevamos"></textarea></div>
+                
+                <button type="submit" class="btn-solicitar" style="width:100%;">PEDIR SERVICIO AHORA</button>
+            </form>
         </div>
-        <p style="text-align: center; margin-top: 30px; font-size: 1.1rem; color: var(--dorado);">
-            Si vendes por internet, somos tu mejor aliado para tus domicilios y envíos.
-        </p>
     </section>
 
     <section class="seccion">
-        <div class="titulo-seccion"><h2>Nuestras Tarifas</h2></div>
+        <div class="titulo-seccion"><h2>Tarifas</h2></div>
         <table class="tabla-precios">
             <tr><td>Medellín</td><td>$12.000</td></tr>
             <tr><td>Itagüí, Envigado, Sabaneta, Bello</td><td>$17.000</td></tr>
             <tr><td>La Estrella</td><td>$18.000</td></tr>
             <tr><td>San Antonio de Prado</td><td>$20.000</td></tr>
             <tr><td>Caldas, Copacabana</td><td>$25.000</td></tr>
-            <tr><td>Girardota</td><td>$33.000</td></tr>
-            <tr><td>Barbosa</td><td>$41.000</td></tr>
         </table>
-        <p style="text-align: center; margin-top: 15px; font-weight: bold;">
-            Para municipios fuera del Área Metropolitana, el valor se calcula por distancia ($2.000 por kilómetro).
-        </p>
-    </section>
-
-    <section id="solicitar" class="seccion" style="background-color: #eee;">
-        <div class="contenedor-formulario">
-            <h2 style="text-align: center; margin-top:0;">Solicita tu servicio ahora mismo</h2>
-            <p style="text-align: center; font-size: 0.9rem;">📱 Atención rápida y personalizada</p>
-            
-            <div class="evidencia-badge">🛡️ Entrega certificada con evidencia digital (foto y firma)</div>
-
-            <form onsubmit="enviarWhatsApp(event)">
-                <div class="form-group"><label>Nombre Remitente:</label><input type="text" id="remitente" required></div>
-                <div class="form-group"><label>Correo (Opcional):</label><input type="email" id="email"></div>
-                <hr>
-                <div class="form-group"><label>Nombre Destinatario:</label><input type="text" id="destinatario" required></div>
-                <div class="form-group"><label>Documento Identidad Destinatario:</label><input type="text" id="cedula" required></div>
-                <div class="form-group"><label>Dirección Recogida:</label><input type="text" id="recogida" required></div>
-                <div class="form-group"><label>Dirección Entrega:</label><input type="text" id="entrega" required></div>
-                <div class="form-group"><label>Datos completos del envío:</label><textarea id="envio" rows="3" required></textarea></div>
-                
-                <button type="submit" class="btn" style="width: 100%; background: var(--verde); color: white; font-size: 1.1rem;">REGISTRAR Y PEDIR SERVICIO</button>
-            </form>
-        </div>
+        <p style="text-align: center; margin-top: 20px; font-weight: bold;">Fuera del Área Metropolitana: $2.000 por kilómetro.</p>
     </section>
 
     <footer>
-        <h3>Rico Express Mensajería</h3>
+        <p><strong>RICO EXPRESS MENSAJERÍA</strong></p>
         <p>Rapidez • Cumplimiento • Confianza</p>
-        <p style="max-width: 600px; margin: 20px auto; font-size: 0.9rem; opacity: 0.8;">
-            Soy un emprendedor independiente en Medellín y cada servicio es una oportunidad para crecer gracias a tu apoyo.
-        </p>
-        <p>© 2026 Rico Express | Medellín, Antioquia</p>
+        <p style="opacity: 0.7; font-size: 0.8rem; margin-top: 10px;">Soy un emprendedor independiente en Medellín. Gracias por tu apoyo.</p>
     </footer>
 
- <script>
-    function enviarWhatsApp(event) {
-        event.preventDefault();
-        
-        const tel = "573134646181";
-        
-        // Función interna para limpiar el símbolo # que rompe los enlaces
-        const limpiar = (texto) => texto.replace(/#/g, 'No.').trim();
+    <script>
+        function enviarWhatsApp(event) {
+            event.preventDefault();
+            const tel = "573134646181";
+            const limpiar = (t) => t.replace(/#/g, 'No.').trim();
 
-        const remitente = limpiar(document.getElementById('remitente').value);
-        const email = document.getElementById('email').value || "No registrado";
-        const destinatario = limpiar(document.getElementById('destinatario').value);
-        const cedula = limpiar(document.getElementById('cedula').value);
-        const recogida = limpiar(document.getElementById('recogida').value);
-        const entrega = limpiar(document.getElementById('entrega').value);
-        const detalles = limpiar(document.getElementById('envio').value);
+            const msg = `*RICO EXPRESS - SOLICITUD*%0A` +
+                        `--------------------------------%0A` +
+                        `*👤 REMITENTE:* ${limpiar(document.getElementById('remitente').value)}%0A` +
+                        `*📧 CORREO:* ${document.getElementById('email').value || "No registrado"}%0A` +
+                        `--------------------------------%0A` +
+                        `*📦 DESTINATARIO:* ${limpiar(document.getElementById('destinatario').value)}%0A` +
+                        `*🆔 CÉDULA:* ${limpiar(document.getElementById('cedula').value)}%0A` +
+                        `--------------------------------%0A` +
+                        `*📍 RECOGIDA:* ${limpiar(document.getElementById('recogida').value)}%0A` +
+                        `*🏁 ENTREGA:* ${limpiar(document.getElementById('entrega').value)}%0A` +
+                        `--------------------------------%0A` +
+                        `*📝 ENVÍO:* ${limpiar(document.getElementById('envio').value)}%0A` +
+                        `--------------------------------%0A` +
+                        `*✅ SOLICITA EVIDENCIA DIGITAL*`;
 
-        // Construcción manual del mensaje
-        let m = "*RICO EXPRESS - SOLICITUD*%0A";
-        m += "--------------------------------%0A";
-        m += "*👤 REMITENTE:* " + remitente + "%0A";
-        m += "*📧 CORREO:* " + email + "%0A";
-        m += "--------------------------------%0A";
-        m += "*📦 DESTINATARIO:* " + destinatario + "%0A";
-        m += "*🆔 CÉDULA:* " + cedula + "%0A";
-        m += "--------------------------------%0A";
-        m += "*📍 RECOGIDA:* " + recogida + "%0A";
-        m += "*🏁 ENTREGA:* " + entrega + "%0A";
-        m += "--------------------------------%0A";
-        m += "*📝 ENVÍO:* " + detalles + "%0A";
-        m += "--------------------------------%0A";
-        m += "*✅ ENTREGA CON EVIDENCIA DIGITAL*";
+            window.open("https://wa.me/" + tel + "?text=" + msg, '_blank');
+        }
 
-        // Abrir WhatsApp con el mensaje procesado
-        window.open("https://wa.me/" + tel + "?text=" + m, '_blank');
-    }
+        function actualizarHorario() {
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            const dia = ahora.getDay();
+            const laborales = [1, 3, 4, 5, 6]; // Lun, Mie, Jue, Vie, Sab
+            const abierto = laborales.includes(dia) && (hora >= 9 && hora < 17);
+            const box = document.getElementById('status-box');
 
-    // El resto de tu función de horario se queda igual
-</script>
+            if(abierto) {
+                box.innerHTML = "🟢 ABIERTO AHORA";
+                box.style.color = "#2ecc71";
+                box.style.borderColor = "#2ecc71";
+            } else {
+                box.innerHTML = "🔴 CERRADO (Atención 9AM - 5PM)";
+                box.style.color = "#e74c3c";
+                box.style.borderColor = "#e74c3c";
+            }
+        }
+        actualizarHorario();
+    </script>
+</body>
+</html>
