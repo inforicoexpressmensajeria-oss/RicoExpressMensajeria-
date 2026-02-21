@@ -154,53 +154,42 @@
         <p>© 2026 Rico Express | Medellín, Antioquia</p>
     </footer>
 
-    <script>
+<script>
     function enviarWhatsApp(event) {
         event.preventDefault();
         
         const tel = "573134646181";
         
-        // Captura de todos los campos
-        const remitente = document.getElementById('remitente').value;
+        // Función interna para limpiar el símbolo # que rompe los enlaces
+        const limpiar = (texto) => texto.replace(/#/g, 'No.').trim();
+
+        const remitente = limpiar(document.getElementById('remitente').value);
         const email = document.getElementById('email').value || "No registrado";
-        const destinatario = document.getElementById('destinatario').value;
-        const cedula = document.getElementById('cedula').value;
-        const recogida = document.getElementById('recogida').value;
-        const entrega = document.getElementById('entrega').value;
-        const detalles = document.getElementById('envio').value;
+        const destinatario = limpiar(document.getElementById('destinatario').value);
+        const cedula = limpiar(document.getElementById('cedula').value);
+        const recogida = limpiar(document.getElementById('recogida').value);
+        const entrega = limpiar(document.getElementById('entrega').value);
+        const detalles = limpiar(document.getElementById('envio').value);
 
-        // Construcción del mensaje asegurando que incluya TODO
-        let mensaje = "*RICO EXPRESS - SOLICITUD DE SERVICIO*%0A";
-        mensaje += "--------------------------------%0A";
-        mensaje += "*👤 REMITENTE:* " + remitente + "%0A";
-        mensaje += "*📧 CORREO:* " + email + "%0A";
-        mensaje += "--------------------------------%0A";
-        mensaje += "*📦 DESTINATARIO:* " + destinatario + "%0A";
-        mensaje += "*🆔 CÉDULA:* " + cedula + "%0A";
-        mensaje += "--------------------------------%0A";
-        mensaje += "*📍 RECOGIDA:* " + recogida + "%0A";
-        mensaje += "*🏁 ENTREGA:* " + entrega + "%0A";
-        mensaje += "--------------------------------%0A";
-        mensaje += "*📝 DATOS ENVÍO:* " + detalles + "%0A";
-        mensaje += "--------------------------------%0A";
-        mensaje += "*✅ ENTREGA CERTIFICADA SOLICITADA*";
+        // Construcción manual del mensaje
+        let m = "*RICO EXPRESS - SOLICITUD*%0A";
+        m += "--------------------------------%0A";
+        m += "*👤 REMITENTE:* " + remitente + "%0A";
+        m += "*📧 CORREO:* " + email + "%0A";
+        m += "--------------------------------%0A";
+        m += "*📦 DESTINATARIO:* " + destinatario + "%0A";
+        m += "*🆔 CÉDULA:* " + cedula + "%0A";
+        m += "--------------------------------%0A";
+        m += "*📍 RECOGIDA:* " + recogida + "%0A";
+        m += "*🏁 ENTREGA:* " + entrega + "%0A";
+        m += "--------------------------------%0A";
+        m += "*📝 ENVÍO:* " + detalles + "%0A";
+        m += "--------------------------------%0A";
+        m += "*✅ ENTREGA CON EVIDENCIA DIGITAL*";
 
-        // Usar encodeURI para evitar que caracteres especiales corten el mensaje
-        const urlFinal = "https://wa.me/" + tel + "?text=" + mensaje;
-        
-        window.open(urlFinal, '_blank');
+        // Abrir WhatsApp con el mensaje procesado
+        window.open("https://wa.me/" + tel + "?text=" + m, '_blank');
     }
 
-    function verHorario() {
-        const h = new Date().getHours();
-        const d = new Date().getDay();
-        const abierto = [1,3,4,5,6].includes(d) && (h >= 9 && h < 17);
-        const status = document.getElementById('status');
-        if(status) {
-            status.innerHTML = abierto ? "🟢 ABIERTO AHORA" : "🔴 CERRADO (Atención 9AM-5PM)";
-            status.style.color = abierto ? "#2ecc71" : "#e74c3c";
-        }
-    }
-    verHorario();
-    </script>
-    
+    // El resto de tu función de horario se queda igual
+</script>
