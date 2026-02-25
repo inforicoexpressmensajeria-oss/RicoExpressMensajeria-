@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rico Express - Sistema de Guías</title>
+    <style>
+        :root { --verde-rico: #84cc16; --negro-rico: #000; --gris-f: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--gris-f); margin: 0; padding: 10px; color: #1e293b; }
+        .container { max-width: 850px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        
+        /* Marca de agua Mascota */
+        .mascota-bg { position: absolute; right: -20px; bottom: 150px; height: 300px; opacity: 0.05; pointer-events: none; }
+
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--verde-rico); padding-bottom: 10px; margin-bottom: 20px; }
+        .logo { height: 80px; }
+        .guia-info { text-align: right; }
+        .guia-num { display: block; font-size: 1.4rem; font-weight: bold; color: #e11d48; border: 2px solid #e11d48; padding: 4px 8px; border-radius: 4px; }
+
+        fieldset { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; padding: 12px; }
+        legend { font-weight: bold; color: var(--verde-rico); font-size: 0.8rem; text-transform: uppercase; padding: 0 10px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; font-size: 0.7rem; font-weight: 700; margin-bottom: 3px; color: #64748b; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 5px; box-sizing: border-box; font-size: 0.9rem; }
+
+        /* Panel de Firma */
+        #signature-pad { border: 2px dashed #cbd5e1; border-radius: 8px; background: #fafafa; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
+        .canvas-container { position: relative; }
+        .btn-clear-sig { position: absolute; top: 5px; right: 5px; font-size: 0.6rem; background: #ef4444; color: white; border: none; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
+
+        #preview { width: 100%; max-height: 200px; object-fit: contain; margin-top: 10px; border-radius: 8px; display: none; border: 1px solid #eee; }
+
+        .actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        .btn-print { background: var(--verde-rico); color: white; }
+        .btn-new { background: #334155; color: white; }
+        .btn:active { transform: scale(0.98); }
+
+        @media print {
+            .no-print, .btn-clear-sig, .actions, input[type="file"] { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; border: none; }
+            input, textarea { border: none; background: transparent; }
+            fieldset { border: 1px solid #ddd; }
+            @page { size: A4; margin: 1cm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="mascota.png" class="mascota-bg" alt="">
+
+    <header>
+        <img src="logo.png" alt="Rico Express" class="logo">
+        <div class="guia-info">
+            <label>GUÍA DE ENVÍO</label>
+            <span id="guiaDisplay" class="guia-num">---</span>
+        </div>
+    </header>
+
+    <div class="grid">
+        <fieldset><legend>Remitente</legend>
+            <label>Nombre</label><input type="text">
+            <label>Dirección/Tel</label><input type="text">
+        </fieldset>
+        <fieldset><legend>Destinatario</legend>
+            <label>Nombre</label><input type="text">
+            <label>Dirección/Tel</label><input type="text">
+        </fieldset>
+    </div>
+
+    <fieldset>
+        <legend>Datos del Paquete</legend>
+        <div class="grid" style="grid-template-columns: 2fr 1fr 1fr;">
+            <div><label>Servicio</label><input type="text" placeholder="Express"></div>
+            <div><label>Peso</label><input type="text"></div>
+            <div><label>Valor</label><input type="text"></div>
+        </div>
+        <label>Observaciones</label><textarea rows="2"></textarea>
+    </fieldset>
+
+    <div class="grid">
+        <fieldset>
+            <legend>Evidencia Fotográfica</legend>
+            <input type="file" id="fotoInput" accept="image/*" capture="camera">
+            <img id="preview" src="">
+        </fieldset>
+        
+        <fieldset>
+            <legend>Firma de Recibido</legend>
+            <div class="canvas-container">
+                <button class="btn-clear-sig no-print" onclick="clearCanvas()">Borrar</button>
+                <canvas id="signature-pad"></canvas>
+            </div>
+            <label id="labelRecibe">Nombre/Cédula:</label>
+            <input type="text" placeholder="Escriba aquí...">
+        </fieldset>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-new" onclick="nuevoRecibo()"> Nuevo Recibo</button>
+        <button class="btn btn-print" onclick="window.print()"> Guardar / Imprimir</button>
+    </div>
+</div>
+
+<script>
+    // LÓGICA DEL CONSECUTIVO
+    const START_NUMBER = 1000001;
+
+    function getNextGuia() {
+        let lastGuia = localStorage.getItem('lastGuia');
+        if (!lastGuia) {
+            lastGuia = START_NUMBER;
+        } else {
+            lastGuia = parseInt(lastGuia) + 1;
+        }
+        localStorage.setItem('lastGuia', lastGuia);
+        document.getElementById('guiaDisplay').innerText = "RX-" + lastGuia;
+    }
+
+    // LÓGICA DE LA FIRMA
+    const canvas = document.getElementById('signature-pad');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function setupCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.height; 
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
+    }
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', (e) => { drawing = true; e.preventDefault(); }, {passive: false});
+    canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); }, {passive: false});
+
+    function draw(e) {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.pageX) - rect.left;
+        const y = (e.clientY || e.pageY) - rect.top;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+
+    function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    // MANEJO DE FOTO
+    document.getElementById('fotoInput').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            const img = document.getElementById('preview');
+            img.src = reader.result;
+            img.style.display = 'block';
+        }
+        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    });
+
+    function nuevoRecibo() {
+        if(confirm("Se generará el siguiente número de guía. ¿Continuar?")) {
+            location.reload();
+        }
+    }
+
+    window.onload = () => {
+        getNextGuia();
+        setupCanvas();
+    };
+</script>
+
+</body>
+</html>
