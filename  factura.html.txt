@@ -1,0 +1,2910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rico Express - Sistema de Mensajería</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a5f2a;
+            --primary-light: #2d8a3e;
+            --primary-dark: #0d3d16;
+            --secondary: #000000;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray: #e0e0e0;
+            --gray-dark: #666666;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gray-light);
+            color: var(--secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-login {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--white);
+        }
+
+        .login-box h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .login-box p {
+            color: var(--gray-dark);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--secondary);
+        }
+
+        /* App Container */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .app-header {
+            background: var(--white);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--white);
+        }
+
+        .brand-text h1 {
+            font-size: 1.2em;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 0.75em;
+            color: var(--gray-dark);
+            margin: 0;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background: var(--white);
+            z-index: 200;
+            transition: left 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 199;
+            display: none;
+        }
+
+        .nav-overlay.active {
+            display: block;
+        }
+
+        .nav-header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .nav-header .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .nav-links {
+            padding: 20px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--secondary);
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-link i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--gray-dark);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card.primary .icon { background: rgba(26, 95, 42, 0.1); color: var(--primary); }
+        .stat-card.success .icon { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .stat-card.warning .icon { background: rgba(255, 193, 7, 0.1); color: var(--warning); }
+        .stat-card.danger .icon { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            padding: 25px 15px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--secondary);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .action-btn i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .action-btn span {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        /* Forms */
+        .form-container {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Service Type Selector */
+        .service-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-option {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .type-option.active {
+            border-color: var(--primary);
+            background: rgba(26, 95, 42, 0.05);
+        }
+
+        .type-option i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        /* Price Display */
+        .price-display {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .price-display h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .price-display .amount {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        /* Lists */
+        .list-container {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-item {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .list-item:hover {
+            background: var(--gray-light);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item-info h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .list-item-info p {
+            font-size: 0.9em;
+            color: var(--gray-dark);
+        }
+
+        .list-item-status {
+            text-align: right;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: var(--warning); color: var(--secondary); }
+        .badge-delivered { background: var(--success); color: var(--white); }
+        .badge-transit { background: #17a2b8; color: var(--white); }
+
+        /* Tracking View */
+        .tracking-timeline {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: -30px;
+            width: 2px;
+            background: var(--gray);
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-item.completed .timeline-icon {
+            background: var(--success);
+        }
+
+        .timeline-content h4 {
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        /* Signature Pad */
+        .signature-container {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        #signaturePad {
+            width: 100%;
+            height: 200px;
+            cursor: crosshair;
+        }
+
+        .signature-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .signature-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Photo Capture */
+        .photo-capture {
+            background: var(--gray-light);
+            border: 2px dashed var(--gray);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .photo-capture:hover {
+            border-color: var(--primary);
+            background: rgba(26, 95, 42, 0.05);
+        }
+
+        .photo-capture i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        /* Invoice Styles */
+        .invoice-container {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .invoice-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .invoice-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--white);
+        }
+
+        .invoice-company h2 {
+            color: var(--primary);
+            font-size: 1.5em;
+        }
+
+        .invoice-company p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h3 {
+            color: var(--primary);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-box {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .detail-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .detail-box p {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .invoice-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .invoice-table tr:nth-child(even) {
+            background: var(--gray-light);
+        }
+
+        .invoice-totals {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total-row.grand-total {
+            font-size: 1.3em;
+            font-weight: bold;
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rico Express - Sistema de Mensajería</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a5f2a;
+            --primary-light: #2d8a3e;
+            --primary-dark: #0d3d16;
+            --secondary: #000000;
+            --white: #ffffff;
+            --gray-light: #f5f5f5;
+            --gray: #e0e0e0;
+            --gray-dark: #666666;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gray-light);
+            color: var(--secondary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-login {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--white);
+        }
+
+        .login-box h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .login-box p {
+            color: var(--gray-dark);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--secondary);
+        }
+
+        /* App Container */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .app-header {
+            background: var(--white);
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--white);
+        }
+
+        .brand-text h1 {
+            font-size: 1.2em;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .brand-text p {
+            font-size: 0.75em;
+            color: var(--gray-dark);
+            margin: 0;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            color: var(--primary);
+        }
+
+        /* Navigation */
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background: var(--white);
+            z-index: 200;
+            transition: left 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            left: 0;
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 199;
+            display: none;
+        }
+
+        .nav-overlay.active {
+            display: block;
+        }
+
+        .nav-header {
+            background: var(--primary);
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .nav-header .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--white);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .nav-links {
+            padding: 20px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--secondary);
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .nav-link i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            color: var(--primary);
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--gray-dark);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card.primary .icon { background: rgba(26, 95, 42, 0.1); color: var(--primary); }
+        .stat-card.success .icon { background: rgba(40, 167, 69, 0.1); color: var(--success); }
+        .stat-card.warning .icon { background: rgba(255, 193, 7, 0.1); color: var(--warning); }
+        .stat-card.danger .icon { background: rgba(220, 53, 69, 0.1); color: var(--danger); }
+
+        .stat-card h3 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            padding: 25px 15px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--secondary);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .action-btn i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .action-btn span {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        /* Forms */
+        .form-container {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Service Type Selector */
+        .service-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-option {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .type-option.active {
+            border-color: var(--primary);
+            background: rgba(26, 95, 42, 0.05);
+        }
+
+        .type-option i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        /* Price Display */
+        .price-display {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .price-display h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .price-display .amount {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        /* Lists */
+        .list-container {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-item {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .list-item:hover {
+            background: var(--gray-light);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item-info h4 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .list-item-info p {
+            font-size: 0.9em;
+            color: var(--gray-dark);
+        }
+
+        .list-item-status {
+            text-align: right;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-pending { background: var(--warning); color: var(--secondary); }
+        .badge-delivered { background: var(--success); color: var(--white); }
+        .badge-transit { background: #17a2b8; color: var(--white); }
+
+        /* Tracking View */
+        .tracking-timeline {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            bottom: -30px;
+            width: 2px;
+            background: var(--gray);
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .timeline-item.completed .timeline-icon {
+            background: var(--success);
+        }
+
+        .timeline-content h4 {
+            margin-bottom: 5px;
+        }
+
+        .timeline-content p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        /* Signature Pad */
+        .signature-container {
+            background: var(--white);
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        #signaturePad {
+            width: 100%;
+            height: 200px;
+            cursor: crosshair;
+        }
+
+        .signature-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-top: 1px solid var(--gray);
+        }
+
+        .signature-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        /* Photo Capture */
+        .photo-capture {
+            background: var(--gray-light);
+            border: 2px dashed var(--gray);
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .photo-capture:hover {
+            border-color: var(--primary);
+            background: rgba(26, 95, 42, 0.05);
+        }
+
+        .photo-capture i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        /* Invoice Styles */
+        .invoice-container {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .invoice-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .invoice-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--white);
+        }
+
+        .invoice-company h2 {
+            color: var(--primary);
+            font-size: 1.5em;
+        }
+
+        .invoice-company p {
+            color: var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        .invoice-title {
+            text-align: right;
+        }
+
+        .invoice-title h3 {
+            color: var(--primary);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-box {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .detail-box h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .detail-box p {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .invoice-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .invoice-table tr:nth-child(even) {
+            background: var(--gray-light);
+        }
+
+        .invoice-totals {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total-row.grand-total {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 2px solid var(--primary);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .invoice-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray);
+            text-align: center;
+            font-size: 0.85em;
+            color: var(--gray-dark);
+        }
+
+        .legal-note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.85em;
+            color: #856404;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* Search Box */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        /* Price Editor */
+        .price-list {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .price-item:last-child {
+            border-bottom: none;
+        }
+
+        .price-item input {
+            width: 120px;
+            padding: 8px;
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .invoice-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .invoice-title {
+                text-align: left;
+            }
+            
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .app-header, .nav-menu, .action-buttons, .btn { display: none !important; }
+            .invoice-container { box-shadow: none; }
+            .page { display: block !important; }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .hidden { display: none !important; }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-dark);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Evidence Display */
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .evidence-item {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .evidence-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .evidence-item .label {
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            background: var(--gray-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="logo-login">📦</div>
+            <h1>Rico Express</h1>
+            <p>Mensajería Independiente</p>
+            <div class="input-group">
+                <label>Contraseña de Administrador</label>
+                <input type="password" id="passwordInput" placeholder="Ingrese contraseña">
+            </div>
+            <button class="btn btn-primary" onclick="login()">
+                <span>🔒</span> Ingresar al Sistema
+            </button>
+            <p style="margin-top: 15px; font-size: 0.85em; color: var(--gray-dark);">
+                Contraseña predeterminada: admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container" id="appContainer">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">📦</div>
+                <div class="brand-text">
+                    <h1>Rico Express</h1>
+                    <p>Sistema de Mensajería</p>
+                </div>
+            </div>
+            <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        </header>
+
+        <!-- Navigation -->
+        <div class="nav-overlay" id="navOverlay" onclick="toggleMenu()"></div>
+        <nav class="nav-menu" id="navMenu">
+            <div class="nav-header">
+                <div class="user-avatar">👤</div>
+                <h3>Jhon Alexander García</h3>
+                <p>Administrador</p>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" onclick="showPage('dashboard'); toggleMenu();">
+                    <span>🏠</span> Panel Principal
+                </a>
+                <a href="#" class="nav-link" onclick="showPage('new-service'); toggleMenu();">
+                    <span>➕</span> Crear Servicio
+                </a>
+                <a href="#" class="nav-link" onclick="showPage('history'); toggleMenu();">
+                    <span>📋</span> Historial
+                </a>
+                <a href="#" class="nav-link" onclick="showPage('tracking'); toggleMenu();">
+                    <span>🔍</span> Seguimiento
+                </a>
+                <a href="#" class="nav-link" onclick="showPage('prices'); toggleMenu();">
+                    <span>💰</span> Configurar Precios
+                </a>
+                <a href="#" class="nav-link" onclick="logout(); toggleMenu();">
+                    <span>🚪</span> Cerrar Sesión
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <div class="page-header">
+                    <h2>Panel Principal</h2>
+                    <p>Bienvenido al sistema de gestión</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card primary">
+                        <div class="icon">📦</div>
+                        <h3 id="statTotal">0</h3>
+                        <p>Total Servicios</p>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="icon">✅</div>
+                        <h3 id="statDelivered">0</h3>
+                        <p>Entregados</p>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="icon">⏳</div>
+                        <h3 id="statPending">0</h3>
+                        <p>Pendientes</p>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="icon">💵</div>
+                        <h3 id="statRevenue">$0</h3>
+                        <p>Ingresos Totales</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; color: var(--primary);">Acciones Rápidas</h3>
+                <div class="quick-actions">
+                    <div class="action-btn" onclick="showPage('new-service')">
+                        <span>➕</span>
+                        <span>Crear Servicio</span>
+                    </div>
+                    <div class="action-btn" onclick="showPage('tracking')">
+                        <span>🔍</span>
+                        <span>Seguimiento</span>
+                    </div>
+                    <div class="action-btn" onclick="showPage('history')">
+                        <span>📋</span>
+                        <span>Historial</span>
+                    </div>
+                    <div class="action-btn" onclick="showPage('prices')">
+                        <span>⚙️</span>
+                        <span>Configuración</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Service Page -->
+            <div class="page" id="new-service">
+                <div class="page-header">
+                    <h2>Crear Nuevo Servicio</h2>
+                    <p>Registra un nuevo envío</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="serviceForm">
+                        <div class="form-group">
+                            <label>Tipo de Calculo</label>
+                            <div class="service-type-selector">
+                                <div class="type-option active" onclick="setCalculationType('fixed')" id="fixedType">
+                                    <span>📍</span>
+                                    <div>Por Municipio</div>
+                                </div>
+                                <div class="type-option" onclick="setCalculationType('distance')" id="distanceType">
+                                    <span>🛣️</span>
+                                    <div>Por Distancia</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Fecha</label>
+                                <input type="date" id="serviceDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Número de Guía (Auto)</label>
+                                <input type="text" id="guideNumber" readonly style="background: var(--gray-light);">
+                            </div>
+                        </div>
+
+                        <h3 style="margin: 25px 0 15px; color: var(--primary); border-bottom: 2px solid var(--gray); padding-bottom: 10px;">
+                            Datos del Cliente
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="clientName" required placeholder="Nombre del cliente">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Documento / CC</label>
+                                <input type="text" id="clientDoc" placeholder="Número de documento">
+                            </div>
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="tel" id="clientPhone" required placeholder="3134646181">
+                            </div>
+                        </div>
+
+                        <h3 style="margin: 25px 0 15px; color: var(--primary); border-bottom: 2px solid var(--gray); padding-bottom: 10px;">
+                            Detalles del Envío
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Dirección de Recogida</label>
+                            <input type="text" id="pickupAddress" required placeholder="Dirección completa de recogida">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Dirección de Entrega</label>
+                            <input type="text" id="deliveryAddress" required placeholder="Dirección completa de entrega">
+                        </div>
+
+                        <div class="form-row" id="municipioRow">
+                            <div class="form-group">
+                                <label>Municipio</label>
+                                <select id="municipio" onchange="calculatePrice()">
+                                    <option value="">Seleccione...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de Servicio</label>
+                                <select id="serviceType">
+                                    <option value="Normal">Normal</option>
+                                    <option value="Express">Express (+30%)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group hidden" id="kmRow">
+                            <label>Distancia (Kilómetros)</label>
+                            <input type="number" id="kmDistance" min="1" placeholder="Ingrese kilómetros" oninput="calculatePrice()">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descripción del Paquete</label>
+                            <textarea id="packageDesc" placeholder="Describe el contenido, dimensiones, peso aproximado..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Forma de Pago</label>
+                                <select id="paymentMethod">
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Nequi">Nequi (3003565305)</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Estado Inicial</label>
+                                <select id="status">
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="En Camino">En Camino</option>
+                                    <option value="Entregado">Entregado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="price-display">
+                            <h3>Valor del Servicio</h3>
+                            <div class="amount" id="priceAmount">$12,000</div>
+                        </div>
+
+                        <h3 style="margin: 25px 0 15px; color: var(--primary); border-bottom: 2px solid var(--gray); padding-bottom: 10px;">
+                            Evidencias de Entrega
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Firma Digital del Cliente</label>
+                            <div class="signature-container">
+                                <canvas id="signaturePad"></canvas>
+                                <div class="signature-buttons">
+                                    <button type="button" class="btn btn-secondary" onclick="clearSignature()">
+                                        🗑️ Limpiar
+                                    </button>
+                                    <button type="button" class="btn btn-primary" onclick="saveSignature()">
+                                        💾 Guardar Firma
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto de Entrega</label>
+                            <div class="photo-capture" onclick="document.getElementById('photoInput').click()">
+                                <span>📷</span>
+                                <div>Click para subir o tomar foto</div>
+                                <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePhoto(event)">
+                            </div>
+                            <img id="photoPreview" class="photo-preview hidden">
+                        </div>
+
+                        <button type="submit" class="btn btn-success" style="margin-top: 30px; font-size: 1.1em;">
+                            <span>💾</span> Guardar Servicio y Generar Factura
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- History Page -->
+            <div class="page" id="history">
+                <div class="page-header">
+                    <h2>Historial de Servicios</h2>
+                    <p>Todos los envíos registrados</p>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="searchHistory" placeholder="Buscar por guía, cliente o municipio..." oninput="filterHistory()">
+                    <button class="btn btn-primary" onclick="filterHistory()">
+                        🔍
+                    </button>
+                </div>
+
+                <div class="list-container" id="historyList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- Tracking Page -->
+            <div class="page" id="tracking">
+                <div class="page-header">
+                    <h2>Seguimiento de Guía</h2>
+                    <p>Consulta el estado de tu envío</p>
+                </div>
+
+                <div class="search-box">
+                    <input type="text" id="trackingInput" placeholder="Ingrese número de guía (ej: REX-0001)">
+                    <button class="btn btn-primary" onclick="searchTracking()">
+                        🔍 Buscar
+                    </button>
+                </div>
+
+                <div id="trackingResult">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- Invoice Page -->
+            <div class="page" id="invoice">
+                <div class="page-header">
+                    <h2>Factura Generada</h2>
+                    <p>Detalle del servicio</p>
+                </div>
+
+                <div id="invoiceContent">
+                    <!-- Dynamic invoice -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="downloadPDF()">
+                        <span>📄</span> Descargar PDF
+                    </button>
+                    <button class="btn btn-success" onclick="printInvoice()">
+                        <span>🖨️</span> Imprimir
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareWhatsApp()">
+                        <span>💬</span> Compartir WhatsApp
+                    </button>
+                    <button class="btn btn-warning" onclick="showPage('dashboard')">
+                        <span>🏠</span> Volver al Inicio
+                    </button>
+                </div>
+            </div>
+
+            <!-- Prices Page -->
+            <div class="page" id="prices">
+                <div class="page-header">
+                    <h2>Configuración de Precios</h2>
+                    <p>Administra tarifas por municipio</p>
+                </div>
+
+                <div class="form-container" style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary);">Tarifa por Kilómetro</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Precio por KM</label>
+                            <input type="number" id="pricePerKm" value="2000" onchange="updatePricePerKm()">
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; color: var(--primary);">Tarifas por Municipio</h3>
+                <div class="price-list" id="priceList">
+                    <!-- Dynamic content -->
+                </div>
+
+                <button class="btn btn-success mt-20" onclick="savePrices()">
+                    <span>💾</span> Guardar Cambios
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Service Detail Modal -->
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalle del Servicio</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Management
+        let services = JSON.parse(localStorage.getItem('rex_services')) || [];
+        let prices = JSON.parse(localStorage.getItem('rex_prices')) || {
+            'Medellín': 12000,
+            'Bello': 17000,
+            'Itagüí': 17000,
+            'Envigado': 17000,
+            'Sabaneta': 17000,
+            'La Estrella': 18000,
+            'San Antonio de Prado': 20000,
+            'Caldas': 25000,
+            'Copacabana': 25000,
+            'Girardota': 33000,
+            'Barbosa': 43000,
+            'Poblado': 14000
+        };
+        let pricePerKm = parseInt(localStorage.getItem('rex_price_per_km')) || 2000;
+        let currentCalculationType = 'fixed';
+        let currentSignature = null;
+        let currentPhoto = null;
+        let currentService = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initSignaturePad();
+            document.getElementById('serviceDate').valueAsDate = new Date();
+            generateGuideNumber();
+            loadPrices();
+            updateStats();
+        });
+
+        // Login System
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === 'admin123') {
+                document.getElementById('loginScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                }, 500);
+            } else {
+                alert('Contraseña incorrecta. Use: admin123');
+            }
+        }
+
+        function logout() {
+            location.reload();
+        }
+
+        // Navigation
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+            document.getElementById('navOverlay').classList.toggle('active');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            if (pageId === 'history') renderHistory();
+            if (pageId === 'prices') renderPrices();
+            if (pageId === 'dashboard') updateStats();
+            
+            window.scrollTo(0, 0);
+        }
+
+        // Guide Number Generator
+        function generateGuideNumber() {
+            const nextNum = services.length + 1;
+            const guideNum = 'REX-' + String(nextNum).padStart(4, '0');
+            document.getElementById('guideNumber').value = guideNum;
+        }
+
+        // Price Management
+        function loadPrices() {
+            const select = document.getElementById('municipio');
+            select.innerHTML = '<option value="">Seleccione...</option>';
+            Object.keys(prices).forEach(municipio => {
+                const option = document.createElement('option');
+                option.value = municipio;
+                option.textContent = `${municipio} ($${prices[municipio].toLocaleString()})`;
+                select.appendChild(option);
+            });
+            document.getElementById('pricePerKm').value = pricePerKm;
+        }
+
+        function renderPrices() {
+            const container = document.getElementById('priceList');
+            container.innerHTML = '';
+            Object.keys(prices).forEach(municipio => {
+                const item = document.createElement('div');
+                item.className = 'price-item';
+                item.innerHTML = `
+                    <span style="font-weight: 600;">${municipio}</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span>$</span>
+                        <input type="number" value="${prices[municipio]}" 
+                               onchange="updatePrice('${municipio}', this.value)"
+                               min="1000" step="500">
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updatePrice(municipio, value) {
+            prices[municipio] = parseInt(value) || 0;
+        }
+
+        function updatePricePerKm() {
+            pricePerKm = parseInt(document.getElementById('pricePerKm').value) || 2000;
+        }
+
+        function savePrices() {
+            localStorage.setItem('rex_prices', JSON.stringify(prices));
+            localStorage.setItem('rex_price_per_km', pricePerKm);
+            loadPrices();
+            alert('Precios guardados correctamente');
+        }
+
+        // Calculation Type
+        function setCalculationType(type) {
+            currentCalculationType = type;
+            document.querySelectorAll('.type-option').forEach(el => el.classList.remove('active'));
+            document.getElementById(type + 'Type').classList.add('active');
+            
+            if (type === 'fixed') {
+                document.getElementById('municipioRow').classList.remove('hidden');
+                document.getElementById('kmRow').classList.add('hidden');
+            } else {
+                document.getElementById('municipioRow').classList.add('hidden');
+                document.getElementById('kmRow').classList.remove('hidden');
+            }
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            let price = 0;
+            if (currentCalculationType === 'fixed') {
+                const municipio = document.getElementById('municipio').value;
+                if (municipio && prices[municipio]) {
+                    price = prices[municipio];
+                }
+            } else {
+                const km = parseFloat(document.getElementById('kmDistance').value) || 0;
+                price = km * pricePerKm;
+            }
+            
+            // Express surcharge
+            if (document.getElementById('serviceType').value === 'Express') {
+                price = Math.round(price * 1.3);
+            }
+            
+            document.getElementById('priceAmount').textContent = '$' + price.toLocaleString();
+            return price;
+        }
+
+        // Signature Pad
+        let signaturePad;
+        function initSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            signaturePad = {
+                canvas: canvas,
+                ctx: canvas.getContext('2d'),
+                drawing: false
+            };
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 200;
+            
+            // Style
+            signaturePad.ctx.strokeStyle = '#000';
+            signaturePad.ctx.lineWidth = 2;
+            signaturePad.ctx.lineCap = 'round';
+            
+            // Events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            signaturePad.drawing = true;
+            const rect = signaturePad.canvas.getBoundingClientRect();
+            signaturePad.ctx.beginPath();
+            signaturePad.ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!signaturePad.drawing) return;
+            const rect = signaturePad.canvas.getBoundingClientRect();
+            signaturePad.ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            signaturePad.ctx.stroke();
+        }
+
+        function stopDrawing() {
+            signaturePad.drawing = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            signaturePad.canvas.dispatchEvent(mouseEvent);
+        }
+
+        function clearSignature() {
+            signaturePad.ctx.clearRect(0, 0, signaturePad.canvas.width, signaturePad.canvas.height);
+            currentSignature = null;
+        }
+
+        function saveSignature() {
+            currentSignature = signaturePad.canvas.toDataURL();
+            alert('Firma guardada');
+        }
+
+        // Photo Handler
+        function handlePhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentPhoto = e.target.result;
+                    document.getElementById('photoPreview').src = currentPhoto;
+                    document.getElementById('photoPreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Form Submission
+        document.getElementById('serviceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const service = {
+                id: Date.now(),
+                guideNumber: document.getElementById('guideNumber').value,
+                date: document.getElementById('serviceDate').value,
+                clientName: document.getElementById('clientName').value,
+                clientDoc: document.getElementById('clientDoc').value,
+                clientPhone: document.getElementById('clientPhone').value,
+                pickupAddress: document.getElementById('pickupAddress').value,
+                deliveryAddress: document.getElementById('deliveryAddress').value,
+                municipio: document.getElementById('municipio').value,
+                kmDistance: document.getElementById('kmDistance').value,
+                calculationType: currentCalculationType,
+                serviceType: document.getElementById('serviceType').value,
+                packageDesc: document.getElementById('packageDesc').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                status: document.getElementById('status').value,
+                price: calculatePrice(),
+                signature: currentSignature,
+                photo: currentPhoto,
+                createdAt: new Date().toISOString()
+            };
+            
+            services.push(service);
+            localStorage.setItem('rex_services', JSON.stringify(services));
+            
+            currentService = service;
+            generateInvoice(service);
+            showPage('invoice');
+            
+            // Reset form
+            this.reset();
+            clearSignature();
+            document.getElementById('photoPreview').classList.add('hidden');
+            currentPhoto = null;
+            currentSignature = null;
+            generateGuideNumber();
+            document.getElementById('serviceDate').valueAsDate = new Date();
+        });
+
+        // Invoice Generation
+        function generateInvoice(service) {
+            const invoiceHTML = `
+                <div class="invoice-container" id="invoicePrint">
+                    <div class="invoice-header">
+                        <div class="invoice-logo-section">
+                            <div class="invoice-logo">📦</div>
+                            <div class="invoice-company">
+                                <h2>Rico Express</h2>
+                                <p>Mensajería Independiente</p>
+                                <p style="font-size: 0.8em; margin-top: 5px;">
+                                    Responsable: Jhon Alexander García<br>
+                                    CC: 1035438750<br>
+                                    Tel: 3134646181<br>
+                                    Cobertura: Antioquia<br>
+                                    Nequi: 3003565305
+                                </p>
+                            </div>
+                        </div>
+                        <div class="invoice-title">
+                            <h3>FACTURA</h3>
+                            <p><strong>Guía:</strong> ${service.guideNumber}</p>
+                            <p><strong>Fecha:</strong> ${formatDate(service.date)}</p>
+                            <p><strong>Estado:</strong> <span class="badge badge-${getStatusColor(service.status)}">${service.status}</span></p>
+                        </div>
+                    </div>
+
+                    <div class="invoice-details">
+                        <div class="detail-box">
+                            <h4>Datos del Cliente</h4>
+                            <p><strong>${service.clientName}</strong></p>
+                            <p>CC: ${service.clientDoc || 'N/A'}</p>
+                            <p>Tel: ${service.clientPhone}</p>
+                        </div>
+                        <div class="detail-box">
+                            <h4>Detalles del Servicio</h4>
+                            <p><strong>Tipo:</strong> ${service.serviceType}</p>
+                            <p><strong>Pago:</strong> ${service.paymentMethod}</p>
+                            <p><strong>Cálculo:</strong> ${service.calculationType === 'fixed' ? 'Por Municipio' : 'Por Distancia'}</p>
+                        </div>
+                    </div>
+
+                    <table class="invoice-table">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Detalle</th>
+                                <th style="text-align: right;">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Servicio de Mensajería</td>
+                                <td>
+                                    ${service.calculationType === 'fixed' ? 
+                                        `Municipio: ${service.municipio}` : 
+                                        `Distancia: ${service.kmDistance} km x $${pricePerKm}`}<br>
+                                    <small>Recogida: ${service.pickupAddress}</small><br>
+                                    <small>Entrega: ${service.deliveryAddress}</small>
+                                </td>
+                                <td style="text-align: right;">$${service.price.toLocaleString()}</td>
+                            </tr>
+                            ${service.packageDesc ? `
+                            <tr>
+                                <td colspan="2"><strong>Contenido:</strong> ${service.packageDesc}</td>
+                                <td></td>
+                            </tr>
+                            ` : ''}
+                        </tbody>
+                    </table>
+
+                    <div class="invoice-totals">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span>$${service.price.toLocaleString()}</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span>TOTAL A PAGAR:</span>
+                            <span>$${service.price.toLocaleString()}</span>
+                        </div>
+                    </div>
+
+                    ${service.signature || service.photo ? `
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">Evidencias de Entrega</h4>
+                        <div class="evidence-grid">
+                            ${service.signature ? `
+                            <div class="evidence-item">
+                                <img src="${service.signature}" alt="Firma">
+                                <div class="label">Firma del Cliente</div>
+                            </div>
+                            ` : ''}
+                            ${service.photo ? `
+                            <div class="evidence-item">
+                                <img src="${service.photo}" alt="Entrega">
+                                <div class="label">Foto de Entrega</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div class="legal-note">
+                        <strong>Nota Legal:</strong> El valor del servicio puede variar según peso del paquete, 
+                        tiempos de espera, condiciones climáticas o zonas de difícil acceso.
+                    </div>
+
+                    <div class="invoice-footer">
+                        <p><strong>¡Gracias por confiar en Rico Express!</strong></p>
+                        <p>Su envío en las mejores manos 🚚</p>
+                        <p style="margin-top: 10px; font-size: 0.8em;">
+                            Documento generado electrónicamente - No requiere firma física
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('invoiceContent').innerHTML = invoiceHTML;
+        }
+
+        // History
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            if (services.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+                        <h3>No hay servicios registrados</h3>
+                        <p>Crea tu primer servicio para comenzar</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = services.sort((a, b) => b.id - a.id).map(service => `
+                <div class="list-item" onclick="viewServiceDetail(${service.id})">
+                    <div class="list-item-info">
+                        <h4>${service.guideNumber}</h4>
+                        <p>${service.clientName} - ${service.municipio || service.kmDistance + 'km'}</p>
+                        <small>${formatDate(service.date)}</small>
+                    </div>
+                    <div class="list-item-status">
+                        <span class="badge badge-${getStatusColor(service.status)}">${service.status}</span>
+                        <p style="margin-top: 5px; font-weight: 600;">$${service.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterHistory() {
+            const search = document.getElementById('searchHistory').value.toLowerCase();
+            const items = document.querySelectorAll('.list-item');
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        // Tracking
+        function searchTracking() {
+            const guideNum = document.getElementById('trackingInput').value.trim().toUpperCase();
+            const service = services.find(s => s.guideNumber.toUpperCase() === guideNum);
+            
+            const resultDiv = document.getElementById('trackingResult');
+            
+            if (!service) {
+                resultDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+                        <h3>Guía no encontrada</h3>
+                        <p>Verifique el número de guía e intente nuevamente</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const timeline = [
+                { status: 'Registrado', date: service.createdAt, completed: true },
+                { status: 'En Proceso', date: service.status !== 'Pendiente' ? service.createdAt : null, completed: service.status !== 'Pendiente' },
+                { status: 'En Camino', date: service.status === 'En Camino' || service.status === 'Entregado' ? service.createdAt : null, completed: service.status === 'En Camino' || service.status === 'Entregado' },
+                { status: 'Entregado', date: service.status === 'Entregado' ? service.createdAt : null, completed: service.status === 'Entregado' }
+            ];
+            
+            resultDiv.innerHTML = `
+                <div class="tracking-timeline">
+                    <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--primary);">
+                        <h3 style="color: var(--primary); font-size: 1.8em;">${service.guideNumber}</h3>
+                        <p style="font-size: 1.2em; margin-top: 10px;">${service.clientName}</p>
+                        <span class="badge badge-${getStatusColor(service.status)}" style="font-size: 1em; margin-top: 10px; display: inline-block;">${service.status}</span>
+                    </div>
+                    
+                    ${timeline.map((item, index) => `
+                        <div class="timeline-item ${item.completed ? 'completed' : ''}">
+                            <div class="timeline-icon">${item.completed ? '✓' : (index + 1)}</div>
+                            <div class="timeline-content">
+                                <h4>${item.status}</h4>
+                                <p>${item.date ? formatDate(item.date) : 'Pendiente'}</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <div style="margin-top: 30px; background: var(--gray-light); padding: 20px; border-radius: 10px;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">Detalles del Envío</h4>
+                        <p><strong>Recogida:</strong> ${service.pickupAddress}</p>
+                        <p><strong>Entrega:</strong> ${service.deliveryAddress}</p>
+                        <p><strong>Descripción:</strong> ${service.packageDesc || 'N/A'}</p>
+                        <p><strong>Valor:</strong> $${service.price.toLocaleString()}</p>
+                    </div>
+
+                    ${service.signature || service.photo ? `
+                    <div style="margin-top: 20px;">
+                        <h4 style="margin-bottom: 15px; color: var(--primary);">Evidencias</h4>
+                        <div class="evidence-grid">
+                            ${service.signature ? `
+                            <div class="evidence-item">
+                                <img src="${service.signature}" style="width: 100%; height: 150px; object-fit: contain; background: white;">
+                                <div class="label">Firma</div>
+                            </div>
+                            ` : ''}
+                            ${service.photo ? `
+                            <div class="evidence-item">
+                                <img src="${service.photo}" style="width: 100%; height: 150px; object-fit: cover;">
+                                <div class="label">Foto</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Service Detail Modal
+        function viewServiceDetail(id) {
+            const service = services.find(s => s.id === id);
+            if (!service) return;
+            
+            currentService = service;
+            
+            document.getElementById('modalBody').innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">${service.guideNumber}</h4>
+                    <p><strong>Cliente:</strong> ${service.clientName}</p>
+                    <p><strong>Teléfono:</strong> ${service.clientPhone}</p>
+                    <p><strong>Estado:</strong> <span class="badge badge-${getStatusColor(service.status)}">${service.status}</span></p>
+                </div>
+                
+                <div style="background: var(--gray-light); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <p><strong>Recogida:</strong> ${service.pickupAddress}</p>
+                    <p><strong>Entrega:</strong> ${service.deliveryAddress}</p>
+                    <p><strong>Valor:</strong> $${service.price.toLocaleString()}</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-primary" onclick="regenerateInvoice(${service.id}); closeModal();">
+                        📄 Ver Factura
+                    </button>
+                    <button class="btn btn-success" onclick="updateStatus(${service.id});">
+                        🔄 Cambiar Estado
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareServiceWhatsApp(${service.id})">
+                        💬 WhatsApp
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteService(${service.id})">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('serviceModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('serviceModal').classList.remove('active');
+        }
+
+        function regenerateInvoice(id) {
+            const service = services.find(s => s.id === id);
+            if (service) {
+                currentService = service;
+                generateInvoice(service);
+                showPage('invoice');
+            }
+        }
+
+        function updateStatus(id) {
+            const service = services.find(s => s.id === id);
+            const statuses = ['Pendiente', 'En Camino', 'Entregado'];
+            const currentIndex = statuses.indexOf(service.status);
+            const nextStatus = statuses[(currentIndex + 1) % statuses.length];
+            
+            service.status = nextStatus;
+            localStorage.setItem('rex_services', JSON.stringify(services));
+            closeModal();
+            renderHistory();
+            alert(`Estado actualizado a: ${nextStatus}`);
+        }
+
+        function deleteService(id) {
+            if (confirm('¿Está seguro de eliminar este servicio?')) {
+                services = services.filter(s => s.id !== id);
+                localStorage.setItem('rex_services', JSON.stringify(services));
+                closeModal();
+                renderHistory();
+                updateStats();
+            }
+        }
+
+        // Export Functions
+        function downloadPDF() {
+            const element = document.getElementById('invoicePrint');
+            if (!element) return;
+            
+            const opt = {
+                margin: 10,
+                filename: `Factura_${currentService.guideNumber}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+            };
+            
+            html2canvas(element).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'letter');
+                const imgWidth = 190;
+                const pageHeight = 277;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 10;
+                
+                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight + 10;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save(`Factura_${currentService.guideNumber}.pdf`);
+            });
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function shareWhatsApp() {
+            if (!currentService) return;
+            
+            const text = `*Rico Express - Factura*\n\n` +
+                `*Guía:* ${currentService.guideNumber}\n` +
+                `*Cliente:* ${currentService.clientName}\n` +
+                `*Valor:* $${currentService.price.toLocaleString()}\n` +
+                `*Estado:* ${currentService.status}\n\n` +
+                `*Recogida:* ${currentService.pickupAddress}\n` +
+                `*Entrega:* ${currentService.deliveryAddress}\n\n` +
+                `Gracias por confiar en nosotros! 🚚`;
+            
+            const url = `https://wa.me/${currentService.clientPhone}?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareServiceWhatsApp(id) {
+            const service = services.find(s => s.id === id);
+            if (service) {
+                currentService = service;
+                shareWhatsApp();
+            }
+        }
+
+        // Utilities
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'Pendiente': 'pending',
+                'En Camino': 'transit',
+                'Entregado': 'delivered'
+            };
+            return colors[status] || 'pending';
+        }
+
+        function updateStats() {
+            const total = services.length;
+            const delivered = services.filter(s => s.status === 'Entregado').length;
+            const pending = services.filter(s => s.status === 'Pendiente').length;
+            const revenue = services.reduce((sum, s) => sum + s.price, 0);
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statDelivered').textContent = delivered;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statRevenue').textContent = '$' + revenue.toLocaleString();
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('serviceModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
